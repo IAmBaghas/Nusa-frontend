@@ -1,70 +1,102 @@
-# Getting Started with Create React App
+# Nusa School Website Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive school website built with React.js and Tailwind CSS, featuring a comprehensive content management system for school administrators.
 
-## Available Scripts
+## 🌟 Features
 
-In the project directory, you can run:
+### 📱 Responsive Design
+- Fully responsive layout that works seamlessly across desktop, tablet, and mobile devices
+- Mobile-first approach ensuring optimal user experience on all screen sizes
+- Interactive preview mode for administrators to test responsive layouts
 
-### `npm start`
+### 🎨 Dynamic Content Management
+- **Banner Management**: Customize hero section with images and text
+- **Logo Settings**: Easy logo upload and management
+- **About Section**: 
+  - Headmaster profile management
+  - School vision and mission editor
+  - School description customization
+- **News & Updates**: 
+  - Rich text editor for post creation
+  - Draft and publish functionality
+  - Category management
+  - Featured image support
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 📅 Event Management
+- Interactive calendar interface
+- Event scheduling and management
+- Upcoming events display
+- Detailed event information with date, time, and description
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🖼️ Gallery Management
+- Image upload and organization
+- Album creation and management
+- Image preview and cropping functionality
+- Responsive gallery display
 
-### `npm test`
+### 👤 Admin Dashboard
+- Comprehensive statistics overview
+- Recent activity monitoring
+- Quick action shortcuts
+- User-friendly interface
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🔗 Footer Customization
+- Contact information management
+- Social media links
+- School location integration
+- Operating hours display
 
-### `npm run build`
+## 🛠️ Technical Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Frontend Framework**: React.js
+- **Styling**: Tailwind CSS with DaisyUI
+- **State Management**: React Hooks
+- **Routing**: React Router DOM
+- **UI Components**: 
+  - Headless UI
+  - Material Tailwind
+  - Hero Icons
+- **Rich Text Editing**: CKEditor 5
+- **Date/Time Handling**: Moment.js
+- **HTTP Client**: Axios
+- **Image Handling**: 
+  - React Image Crop
+  - Pintura Image Editor
+- **Calendar**: React Big Calendar
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📁 Project Structure
 
-### `npm run eject`
+Nusa-frontend/
+├── public/
+├── src/
+│ ├── components/
+│ │ ├── HomeComponents/
+│ │ ├── WebSettingComponents/
+│ │ └── PostsManagementComponent/
+│ ├── pages/
+│ │ ├── admin/
+│ │ └── public/
+│ ├── layouts/
+│ ├── styles/
+│ └── assets/
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🔒 Security
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Protected routes for admin access
+- JWT authentication
+- Secure file upload handling
+- Input validation and sanitization
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🎯 Browser Support
 
-## Learn More
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📄 License
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
