@@ -25,6 +25,7 @@ const AccountManagement = () => {
         accountId: null,
         accountName: ''
     });
+    // eslint-disable-next-line no-unused-vars
     const [selectedImage, setSelectedImage] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
