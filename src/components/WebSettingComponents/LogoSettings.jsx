@@ -134,7 +134,6 @@ const LogoSettings = () => {
 
   const saveSettings = async (newLogos, enabled) => {
     try {
-      const token = localStorage.getItem('token');
       await axios.put(
         'http://localhost:5000/api/web-settings/component/logos',
         {
@@ -142,8 +141,7 @@ const LogoSettings = () => {
             logos: newLogos,
             enabled: enabled
           }
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
     } catch (error) {
       console.error('Error saving settings:', error);

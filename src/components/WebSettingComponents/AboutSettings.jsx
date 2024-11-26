@@ -106,11 +106,9 @@ const AboutSettings = () => {
 
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem('token');
       await axios.put(
         'http://localhost:5000/api/web-settings/component/about',
-        { settings: content },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { settings: content }
       );
 
       setToast({
@@ -135,13 +133,11 @@ const AboutSettings = () => {
       const formData = new FormData();
       formData.append('image', aboutImage, 'headmaster.png');
 
-      const token = localStorage.getItem('token');
       const uploadResponse = await axios.post(
         'http://localhost:5000/api/web-settings/upload/about',
         formData,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         }
@@ -156,8 +152,7 @@ const AboutSettings = () => {
 
       await axios.put(
         'http://localhost:5000/api/web-settings/component/about',
-        { settings: updatedContent },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { settings: updatedContent }
       );
 
       setContent(updatedContent);

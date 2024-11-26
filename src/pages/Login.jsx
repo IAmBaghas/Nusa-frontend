@@ -49,10 +49,7 @@ const Login = () => {
   };
 
   const storeToken = (token) => {
-    sessionStorage.setItem('token', token);
-    
-    const expiresAt = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
-    sessionStorage.setItem('tokenExpires', expiresAt.toISOString());
+    localStorage.setItem('token', token);
   };
 
   // Menangani proses login
@@ -67,20 +64,9 @@ const Login = () => {
         password
       });
 
-      // With OTP
-      // if (response.data.success) {
-      //   if (response.data.requiresOTP) {
-      //     setShowOtpInput(true);
-      //   } else if (response.data.token) {
-      //     storeToken(response.data.token);
-      //     navigate('/admin');
-      //   }
-
-      // No OTP
       if (response.data.success && response.data.token) {
         storeToken(response.data.token);
-        navigate('/admin');
-
+        navigate('/admin', { replace: true });
       } else {
         setError(response.data.message || 'Invalid response from server');
       }

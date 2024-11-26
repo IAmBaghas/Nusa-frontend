@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../utils/axiosConfig';
 import moment from 'moment';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Toast from '../Toast';
+
+const getFilenameFromPath = (filepath) => {
+    if (!filepath) return '';
+    return filepath.split('/').pop();
+};
 
 const AccountManagement = () => {
-    // eslint-disable-next-line no-unused-vars
-    const navigate = useNavigate();
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedAccount, setSelectedAccount] = useState(null);
@@ -22,6 +25,8 @@ const AccountManagement = () => {
         accountId: null,
         accountName: ''
     });
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     useEffect(() => {
         fetchAccounts();
@@ -32,11 +37,7 @@ const AccountManagement = () => {
             setLoading(true);
             setError(null);
             
-            const token = sessionStorage.getItem('token');
-            const response = await axiosInstance.get('/api/accounts/profiles', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
+            const response = await axios.get('http://localhost:5000/api/accounts/profiles');
             const sortedAccounts = response.data.sort((a, b) => a.id - b.id);
             setAccounts(sortedAccounts);
         } catch (error) {
@@ -50,40 +51,21 @@ const AccountManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
-
-            // Validate fields
-            if (!formData.username || !formData.full_name || !formData.email) {
-                const errorDialog = document.getElementById('alert_error');
-                if (errorDialog) {
-                    const errorText = errorDialog.querySelector('.py-4');
-                    if (errorText) {
-                        errorText.textContent = 'All fields are required';
-                    }
-                    errorDialog.showModal();
-                }
-                return;
-            }
-
-            // Create new account
-            // eslint-disable-next-line no-unused-vars
-            const response = await axiosInstance.post(
-                '/api/accounts/profiles',
+            // Create new account without token
+            await axios.post(
+                'http://localhost:5000/api/accounts/profiles',
                 formData,
                 { 
                     headers: { 
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     } 
                 }
             );
 
-            // Refresh accounts list
             await fetchAccounts();
             setShowModal(false);
             resetForm();
 
-            // Show success message with created account details
             const successDialog = document.getElementById('alert_success');
             if (successDialog) {
                 const messageText = successDialog.querySelector('.py-4');
@@ -96,7 +78,6 @@ const AccountManagement = () => {
             console.error('Error creating account:', error);
             const errorMessage = error.response?.data?.message || 'Failed to create account';
             
-            // Show error modal with specific message
             const errorDialog = document.getElementById('alert_error');
             if (errorDialog) {
                 const errorText = errorDialog.querySelector('.py-4');
@@ -109,7 +90,6 @@ const AccountManagement = () => {
     };
 
     const handleResetPassword = async (accountId, accountName) => {
-        // Show confirmation modal
         setResetConfirmation({
             show: true,
             accountId,
@@ -119,21 +99,16 @@ const AccountManagement = () => {
 
     const confirmReset = async () => {
         try {
-            const token = localStorage.getItem('token');
-            await axiosInstance.post(
-                `/api/accounts/profiles/${resetConfirmation.accountId}/reset`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
+            await axios.post(
+                `http://localhost:5000/api/accounts/profiles/${resetConfirmation.accountId}/reset`
             );
 
-            // Close confirmation modal
             setResetConfirmation({
                 show: false,
                 accountId: null,
                 accountName: ''
             });
 
-            // Show success modal with user's name
             const successResetDialog = document.getElementById('alert_success_reset');
             if (successResetDialog) {
                 const messageText = successResetDialog.querySelector('.py-4');
@@ -144,7 +119,6 @@ const AccountManagement = () => {
             }
         } catch (error) {
             console.error('Error resetting password:', error);
-            // Show error modal with specific message
             const errorDialog = document.getElementById('alert_error');
             if (errorDialog) {
                 const errorText = errorDialog.querySelector('.py-4');
@@ -156,55 +130,23 @@ const AccountManagement = () => {
         }
     };
 
-    const resetForm = () => {
-        setFormData({
-            username: '',
-            full_name: '',
-            email: ''
-        });
-        setSelectedAccount(null);
-    };
-
-    const filteredAccounts = accounts.filter(account => 
-        account.full_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     const handleEdit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
-            
-            // Validate fields
-            if (!formData.username || !formData.full_name || !formData.email) {
-                const errorDialog = document.getElementById('alert_error');
-                if (errorDialog) {
-                    const errorText = errorDialog.querySelector('.py-4');
-                    if (errorText) {
-                        errorText.textContent = 'All fields are required';
-                    }
-                    errorDialog.showModal();
-                }
-                return;
-            }
-
-            // Update profile
-            await axiosInstance.put(
-                `/api/accounts/profiles/${selectedAccount.id}`,
+            await axios.put(
+                `http://localhost:5000/api/accounts/profiles/${selectedAccount.id}`,
                 formData,
                 { 
                     headers: { 
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     } 
                 }
             );
 
-            // Refresh accounts list
             await fetchAccounts();
             setShowModal(false);
             resetForm();
 
-            // Show success modal
             const successDialog = document.getElementById('alert_success');
             if (successDialog) {
                 successDialog.showModal();
@@ -213,7 +155,6 @@ const AccountManagement = () => {
             console.error('Error updating account:', error);
             const errorMessage = error.response?.data?.message || 'Failed to update account';
             
-            // Show error modal
             const errorDialog = document.getElementById('alert_error');
             if (errorDialog) {
                 const errorText = errorDialog.querySelector('.py-4');
@@ -227,19 +168,16 @@ const AccountManagement = () => {
 
     const handleToggleMainPage = async (id, value) => {
         try {
-            const token = localStorage.getItem('token');
-            await axiosInstance.put(
-                `/api/accounts/profiles/${id}/main-page`,
+            await axios.put(
+                `http://localhost:5000/api/accounts/profiles/${id}/main-page`,
                 { main_page: value },
                 { 
                     headers: { 
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     } 
                 }
             );
             
-            // Update local state immediately
             setAccounts(prevAccounts => 
                 prevAccounts.map(account => 
                     account.id === id 
@@ -257,26 +195,22 @@ const AccountManagement = () => {
                 }
                 errorDialog.showModal();
             }
-            // Revert the toggle if there's an error
             await fetchAccounts();
         }
     };
 
     const handleToggleStatus = async (id, value) => {
         try {
-            const token = localStorage.getItem('token');
-            await axiosInstance.put(
-                `/api/accounts/profiles/${id}/status`,
+            await axios.put(
+                `http://localhost:5000/api/accounts/profiles/${id}/status`,
                 { status: value },
                 { 
                     headers: { 
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     } 
                 }
             );
             
-            // Update local state immediately
             setAccounts(prevAccounts => 
                 prevAccounts.map(account => 
                     account.id === id 
@@ -294,8 +228,53 @@ const AccountManagement = () => {
                 }
                 errorDialog.showModal();
             }
-            // Revert the toggle if there's an error
             await fetchAccounts();
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            username: '',
+            full_name: '',
+            email: ''
+        });
+        setSelectedAccount(null);
+    };
+
+    const filteredAccounts = accounts.filter(account => 
+        account.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const handleImageUpload = async (id, file) => {
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            await axios.post(
+                `http://localhost:5000/api/accounts/profiles/${id}/image`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            // Refresh accounts to get updated image
+            await fetchAccounts();
+
+            setToast({
+                show: true,
+                message: 'Profile image updated successfully',
+                type: 'success'
+            });
+        } catch (error) {
+            console.error('Error uploading profile image:', error);
+            setToast({
+                show: true,
+                message: 'Failed to upload profile image',
+                type: 'error'
+            });
         }
     };
 
@@ -414,9 +393,11 @@ const AccountManagement = () => {
                                     <td className="font-medium">{account.id}</td>
                                     <td>
                                         <div className="avatar">
-                                            <div className="w-8 h-8 rounded-full">
+                                            <div className="w-8 h-8 rounded-full relative group">
                                                 <img
-                                                    src={account.profile_image || "https://via.placeholder.com/40"}
+                                                    src={account.profile_image 
+                                                        ? `http://localhost:5000/api/accounts/profile-image/${account.id}/${getFilenameFromPath(account.profile_image)}`
+                                                        : "https://via.placeholder.com/40"}
                                                     alt={account.full_name}
                                                     className="object-cover"
                                                     onError={(e) => {
@@ -424,6 +405,22 @@ const AccountManagement = () => {
                                                         e.target.src = "https://via.placeholder.com/40";
                                                     }}
                                                 />
+                                                <label className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-full">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            if (e.target.files?.[0]) {
+                                                                handleImageUpload(account.id, e.target.files[0]);
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
                                             </div>
                                         </div>
                                     </td>
@@ -648,6 +645,15 @@ const AccountManagement = () => {
                         })}>close</button>
                     </form>
                 </dialog>
+            )}
+
+            {/* Add Toast component at the end */}
+            {toast.show && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast({ ...toast, show: false })}
+                />
             )}
         </div>
     );

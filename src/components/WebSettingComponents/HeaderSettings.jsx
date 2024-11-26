@@ -125,11 +125,9 @@ const HeaderSettings = () => {
 
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem('token');
       await axios.put(
         'http://localhost:5000/api/web-settings/component/header',
-        { settings: content },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { settings: content }
       );
 
       setToast({
@@ -149,59 +147,47 @@ const HeaderSettings = () => {
 
   const handleSaveImage = async () => {
     if (!headerImage) return;
-    setLoading(true);
 
     try {
-        // Create FormData object
-        const formData = new FormData();
-        formData.append('image', headerImage, 'header.png');
+      const formData = new FormData();
+      formData.append('image', headerImage, 'header.png');
 
-        // Upload image first
-        const token = localStorage.getItem('token');
-        const uploadResponse = await axios.post(
-            'http://localhost:5000/api/web-settings/upload/header',
-            formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-        );
+      const uploadResponse = await axios.post(
+        'http://localhost:5000/api/web-settings/upload/header',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
 
-        // Get the image path from response
-        const imagePath = uploadResponse.data.path;
+      const imagePath = uploadResponse.data.path;
 
-        // Update settings with new image path
-        const updatedContent = {
-            ...content,
-            image: `http://localhost:5000/uploads/header/${imagePath}`
-        };
+      const updatedContent = {
+        ...content,
+        image: `http://localhost:5000/uploads/header/${imagePath}`
+      };
 
-        // Save settings
-        await axios.put(
-            'http://localhost:5000/api/web-settings/component/header',
-            { settings: updatedContent },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
+      await axios.put(
+        'http://localhost:5000/api/web-settings/component/header',
+        { settings: updatedContent }
+      );
 
-        setContent(updatedContent);
-        setShowCropper(false);
-        setCropImage(null);
-        setToast({
-            show: true,
-            message: 'Header image saved successfully',
-            type: 'success'
-        });
+      setContent(updatedContent);
+      setShowCropper(false);
+      setToast({
+        show: true,
+        message: 'Header image saved successfully',
+        type: 'success'
+      });
     } catch (error) {
-        console.error('Error saving header image:', error);
-        setToast({
-            show: true,
-            message: error.response?.data?.message || 'Failed to save header image',
-            type: 'error'
-        });
-    } finally {
-        setLoading(false);
+      console.error('Error saving header image:', error);
+      setToast({
+        show: true,
+        message: error.response?.data?.message || 'Failed to save header image',
+        type: 'error'
+      });
     }
   };
 

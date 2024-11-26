@@ -8,8 +8,8 @@ import WebEdit from './pages/admin/WebEdit';
 import GalleryManagement from './pages/admin/GalleryManagement';
 import PostsManagement from './pages/admin/PostsManagement';
 import AgendaManagement from './pages/admin/AgendaManagement';
-import PrivateRoute from './components/PrivateRoute';
 import MobileManagement from './pages/admin/MobileManagement';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -17,7 +17,11 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<DashboardHome />} />
           <Route path="web-edit" element={<WebEdit />} />
           <Route path="gallery" element={<GalleryManagement />} />

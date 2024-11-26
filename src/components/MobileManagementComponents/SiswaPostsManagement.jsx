@@ -54,6 +54,11 @@ const swiperStyles = `
   }
 `;
 
+const getFilenameFromPath = (filepath) => {
+    if (!filepath) return '';
+    return filepath.split('/').pop();
+};
+
 const SiswaPostsManagement = () => {
     const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
@@ -75,39 +80,25 @@ const SiswaPostsManagement = () => {
 
     const fetchPosts = async () => {
         try {
-            if (!checkToken()) {
-                clearToken();
-                navigate('/login');
-                return;
+            const response = await axios.get('http://localhost:5000/api/mobile-management/posts');
+            
+            if (Array.isArray(response.data)) {
+                const processedPosts = response.data.map(post => ({
+                    ...post,
+                    status_text: post.status ? 'Published' : 'Archived',
+                    profile_image: post.profile_image,
+                    images: post.images || []
+                }));
+
+                console.log('Processed posts:', processedPosts);
+                setPosts(processedPosts);
+            } else {
+                console.error('Invalid response format:', response.data);
+                setError('Invalid response format from server');
             }
-
-            setLoading(true);
-            const token = sessionStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/api/mobile-management/posts', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // Process posts to include proper paths
-            const processedPosts = response.data.map(post => ({
-                ...post,
-                status_text: post.status ? 'Published' : 'Archived',
-                profile_image: post.profile_image || null,
-                images: post.images.map(img => ({
-                    ...img,
-                    file: img.file
-                }))
-            }));
-
-            console.log('Processed posts:', processedPosts); // Debug log
-            setPosts(processedPosts);
         } catch (error) {
             console.error('Error fetching posts:', error);
-            if (error.response?.status === 403) {
-                clearToken();
-                navigate('/login');
-            } else {
-                setError(error.response?.data?.message || 'Error fetching posts');
-            }
+            setError(error.response?.data?.message || 'Error fetching posts');
         } finally {
             setLoading(false);
         }
@@ -211,7 +202,7 @@ const SiswaPostsManagement = () => {
 
     const filteredPosts = posts.filter(post => {
         const nameMatches = post.full_name.toLowerCase().includes(searchQuery.toLowerCase());
-        const statusMatches = activeSection === 'published' ? post.status : !post.status;
+        const statusMatches = activeSection === 'published' ? post.status === true : post.status === false;
         return nameMatches && statusMatches;
     });
 
@@ -290,14 +281,14 @@ const SiswaPostsManagement = () => {
                                     <div className="w-2 h-2 rounded-full bg-success"></div>
                                     <span className="text-gray-600">Published:</span>
                                     <span className="font-medium text-success">
-                                        {posts.filter(post => post.status).length}
+                                        {posts.filter(post => post.status === true).length}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 min-w-[100px]">
                                     <div className="w-2 h-2 rounded-full bg-error"></div>
                                     <span className="text-gray-600">Archived:</span>
                                     <span className="font-medium text-error">
-                                        {posts.filter(post => !post.status).length}
+                                        {posts.filter(post => post.status === false).length}
                                     </span>
                                 </div>
                             </div>
@@ -331,7 +322,9 @@ const SiswaPostsManagement = () => {
                                     <div className="avatar">
                                         <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                                             <img
-                                                src={post.profile_image || 'https://via.placeholder.com/40'}
+                                                src={post.profile_image 
+                                                    ? `http://localhost:5000/api/profile/image/${post.profile_id}/${getFilenameFromPath(post.profile_image)}`
+                                                    : 'https://via.placeholder.com/40'}
                                                 alt={post.full_name}
                                                 className="object-cover"
                                                 onError={(e) => {
@@ -368,7 +361,7 @@ const SiswaPostsManagement = () => {
                                                         alt={image.judul || `Image ${index + 1}`}
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {
-                                                            console.error('Image load error:', image.file);
+                                                            console.error('Post image load error:', image.file);
                                                             e.target.src = 'https://via.placeholder.com/400?text=Image+Not+Found';
                                                         }}
                                                     />
@@ -470,9 +463,14 @@ const SiswaPostsManagement = () => {
                                     <div className="avatar">
                                         <div className="w-10 h-10 rounded-full">
                                             <img
-                                                src={postToDelete.profile_image || 'https://via.placeholder.com/40'}
-                                                alt={postToDelete.full_name}
+                                                src={postToDelete?.profile_image 
+                                                    ? `http://localhost:5000/api/profile/image/${postToDelete.profile_id}/${getFilenameFromPath(postToDelete.profile_image)}`
+                                                    : 'https://via.placeholder.com/40'}
+                                                alt={postToDelete?.full_name}
                                                 className="object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/40';
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -580,9 +578,14 @@ const SiswaPostsManagement = () => {
                                     <div className="avatar">
                                         <div className="w-10 h-10 rounded-full">
                                             <img
-                                                src={postToRestore.profile_image || 'https://via.placeholder.com/40'}
-                                                alt={postToRestore.full_name}
+                                                src={postToRestore?.profile_image 
+                                                    ? `http://localhost:5000/api/profile/image/${postToRestore.profile_id}/${getFilenameFromPath(postToRestore.profile_image)}`
+                                                    : 'https://via.placeholder.com/40'}
+                                                alt={postToRestore?.full_name}
                                                 className="object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/40';
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -654,9 +657,14 @@ const SiswaPostsManagement = () => {
                                     <div className="avatar">
                                         <div className="w-10 h-10 rounded-full">
                                             <img
-                                                src={postToDeletePermanent.profile_image || 'https://via.placeholder.com/40'}
-                                                alt={postToDeletePermanent.full_name}
+                                                src={postToDeletePermanent?.profile_image 
+                                                    ? `http://localhost:5000/api/profile/image/${postToDeletePermanent.profile_id}/${getFilenameFromPath(postToDeletePermanent.profile_image)}`
+                                                    : 'https://via.placeholder.com/40'}
+                                                alt={postToDeletePermanent?.full_name}
                                                 className="object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/40';
+                                                }}
                                             />
                                         </div>
                                     </div>

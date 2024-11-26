@@ -109,13 +109,11 @@ const BannerSettings = () => {
       const formData = new FormData();
       formData.append('image', bannerImage, 'banner.png');
 
-      const token = localStorage.getItem('token');
       const uploadResponse = await axios.post(
         'http://localhost:5000/api/web-settings/upload/banner',
         formData,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         }
@@ -130,8 +128,7 @@ const BannerSettings = () => {
 
       await axios.put(
         'http://localhost:5000/api/web-settings/component/banner',
-        { settings: updatedContent },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { settings: updatedContent }
       );
 
       setContent(updatedContent);
@@ -156,11 +153,6 @@ const BannerSettings = () => {
 
   const handleSubmitText = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await axios.put(
         'http://localhost:5000/api/web-settings/component/banner',
         { 
@@ -168,7 +160,6 @@ const BannerSettings = () => {
         },
         { 
           headers: { 
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           } 
         }

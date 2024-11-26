@@ -42,11 +42,9 @@ const FooterSettings = () => {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
             await axios.put(
                 'http://localhost:5000/api/web-settings/component/footer',
-                { settings: content },
-                { headers: { Authorization: `Bearer ${token}` } }
+                { settings: content }
             );
             
             setToast({
