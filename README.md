@@ -65,23 +65,6 @@ A modern, responsive school website built with React.js and Tailwind CSS, featur
 - **Calendar**: React Big Calendar
 
 
-## 📁 Project Structure
-
-Nusa-frontend/
-├── public/
-├── src/
-│ ├── components/
-│ │ ├── HomeComponents/
-│ │ ├── WebSettingComponents/
-│ │ └── PostsManagementComponent/
-│ ├── pages/
-│ │ ├── admin/
-│ │ └── public/
-│ ├── layouts/
-│ ├── styles/
-│ └── assets/
-
-
 ## 🔒 Security
 
 - Protected routes for admin access
